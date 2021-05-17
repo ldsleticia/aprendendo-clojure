@@ -17,5 +17,14 @@
   (deve-assinar-pre-autorizacao? [paciente, procedimento, valor]
     (>= valor 50)))
 
-(let [particular (->PacienteParticular 15, "Guilherme", "18/09/1981")]
-(pprint (deve-assinar-pre-autorizacao? particular, :raio-x, 500)))
+(extend-type PacientePlanoDeSaude
+  Cobravel
+  (deve-assinar-pre-autorizacao? [paciente, procedimento, valor]
+    (let [plano (:plano paciente)]
+      (not (some #(= % procedimento) plano)))))
+
+(let [particular (->PacienteParticular 15, "Guilherme", "18/09/1981")
+      plano (->PacientePlanoDeSaude 16, "Letícia", "16/04/1996" [:raio-x, :ultrassom])]
+(pprint (deve-assinar-pre-autorizacao? particular, :raio-x, 500))
+(pprint (deve-assinar-pre-autorizacao? plano, :raio-x, 500))
+(pprint (deve-assinar-pre-autorizacao? plano, :coleta-de-sangue, 500)))
